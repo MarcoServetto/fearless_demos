@@ -4,5 +4,6 @@
   "rank": "app999",
   "tags": ["game", "puzzle", "gui"],
   "download": "https://marcoautomation2.github.io/lights_out/lights_out_app.zip",
-  "page": "https://marcoautomation2.github.io/lights_out/"
+  "page": "https://marcoautomation2.github.io/lights_out/",
+  "image": "https://marcoautomation2.github.io/lights_out/preview.png"
 }
