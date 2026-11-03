@@ -1,0 +1,87 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate demos
+        run: |
+          rules='
+          def rank_ok: type=="string" and test("^(base|core|driver|worker|framework|accumulator|tool|app)[0-9]{3}$");
+          def https: type=="string" and test("^https://[A-Za-z0-9.-]+(:[0-9]+)?([/?#][^\\s\"<>]*)?$");
+          def text: type=="string" and test("\\S");
+          def tag_ok: type=="string" and test("^[a-z0-9]+( [a-z0-9]+)*$");
+          def zip: sub("^https://[^/]*";"") | sub("[?#].*$";"") | split("/") | last;
+          if type!="object" then "the file must hold one JSON object" else
+            . as $d
+            | ((keys_unsorted - ["title","summary","rank","tags","download","page","image"])[] | "unknown field \"\(.)\", the fields are title, summary, rank, tags, download, page and image"),
+              (("title","summary","rank","tags","download") as $k | select($d | has($k) | not) | "required field \"\($k)\" is missing"),
+              (("title","summary") as $k | select(($d | has($k)) and ($d[$k] | text | not)) | "field \"\($k)\" must be a non-empty string"),
+              (select(has("rank") and (.rank | rank_ok | not)) | "field \"rank\" is \(.rank | tojson) but must be one of base, core, driver, worker, framework, accumulator, tool or app followed by exactly three digits, for example core120"),
+              (select(has("tags") and ((.tags | type=="array" and length>0 and all(.[]; tag_ok) and (unique | length)==length) | not)) | "field \"tags\" must be a non-empty list of different tags, each made of lowercase letters, digits and single spaces"),
+              (select(has("download") and (.download | https | not)) | "field \"download\" is \(.download | tojson) but must be an https URL"),
+              (select((.rank | rank_ok) and (.download | https)) | (.download | zip) as $z | (.rank | startswith("app")) as $app
+                | if $app then select($z | test("^[^/]+_(edu_)?app\\.zip$") | not) | "the download of an app (rank \(.rank)) must be a zip whose name ends with _app.zip or _edu_app.zip, but the zip is named \($z | tojson)"
+                  else select($z | test("^[^/]+_(edu_)?lib\\.zip$") | not) | "the download of a library (rank \(.rank)) must be a zip whose name ends with _lib.zip or _edu_lib.zip, but the zip is named \($z | tojson)" end),
+              (("page","image") as $k | select(has($k) and (.[$k] | https | not)) | "field \"\($k)\" is \(.[$k] | tojson) but must be an https URL")
+          end
+          '
+          [ "$(ls demos | wc -l)" -gt 0 ] || { echo "::error::the folder demos holds no demo"; exit 1; }
+          status=0
+          for f in demos/*; do
+            name=${f##*/}
+            if [ ! -f "$f" ] || ! [[ $name =~ ^[a-z][a-z0-9_]*\.json$ ]]; then
+              echo "::error file=$f::the name of a demo file must be an id followed by .json, where the id has lowercase letters, digits and underscores and starts with a letter"
+              status=1
+              continue
+            fi
+            if ! out=$(jq -r "$rules" "$f" 2>&1); then
+              echo "::error file=$f::the file is not valid JSON: ${out//$'\n'/ }"
+              status=1
+              continue
+            fi
+            while IFS= read -r line; do
+              [ -z "$line" ] || { echo "::error file=$f::$line"; status=1; }
+            done <<< "$out"
+          done
+          if [ "$status" = 0 ]; then
+            duplicates=$(jq -n -r '[inputs | {file: input_filename, url: .download}] | group_by(.url)[] | select(length>1) | "::error file=\(.[0].file)::the download \(.[0].url) is used by more than one demo: \([.[].file] | join(" and "))"' demos/*.json)
+            [ -z "$duplicates" ] || { echo "$duplicates"; status=1; }
+          fi
+          [ "$status" = 0 ] || { echo "Some demo files are broken, see the errors above."; exit 1; }
+          echo "All demo files are valid."
+      - name: Assemble site
+        run: |
+          mkdir _site
+          cp site/* _site/
+          jq -n '[inputs | . + {id: (input_filename | sub("^.*/"; "") | sub("\\.json$"; ""))}] | sort_by(.id)' demos/*.json > _site/demos.json
+      - uses: actions/configure-pages@v6
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

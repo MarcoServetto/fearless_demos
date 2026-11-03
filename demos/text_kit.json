@@ -1,0 +1,8 @@
+{
+  "title": "Text Kit",
+  "summary": "A library of small text helpers: padding, slugs, word counting and truncation.",
+  "rank": "core200",
+  "tags": ["text", "strings", "utilities"],
+  "download": "https://marcoautomation2.github.io/text_kit/text_kit_lib.zip",
+  "page": "https://marcoautomation2.github.io/text_kit/"
+}

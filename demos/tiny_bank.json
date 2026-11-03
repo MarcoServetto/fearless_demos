@@ -1,0 +1,8 @@
+{
+  "title": "Tiny Bank",
+  "summary": "A small bank ledger that teaches immutable data, optional results and testing. Every lesson is checked twice: by autotests written in the doc comments and by explicit unit tests.",
+  "rank": "app999",
+  "tags": ["education", "testing", "finance"],
+  "download": "https://marcoautomation2.github.io/tiny_bank/tiny_bank_edu_app.zip",
+  "page": "https://marcoautomation2.github.io/tiny_bank/"
+}
