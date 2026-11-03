@@ -1,0 +1,8 @@
+{
+  "title": "Shapes Lab",
+  "summary": "A teaching library about sealed types: grid shapes with area, perimeter and bounding boxes, written to be read.",
+  "rank": "worker100",
+  "tags": ["education", "geometry", "sealed types"],
+  "download": "https://marcoautomation2.github.io/shapes_lab/shapes_lab_edu_lib.zip",
+  "page": "https://marcoautomation2.github.io/shapes_lab/"
+}

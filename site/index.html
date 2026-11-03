@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Fearless Demos</title>
+  <meta name="description" content="Apps and libraries written in Fearless. Every demo is one zip to download.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#demos">Skip to the demos</a>
+  <header class="site_header">
+    <div class="wrap bar">
+      <a class="brand" href="./"><img src="favicon.svg" alt="" width="32" height="32"><span>Fearless Demos</span></a>
+      <p class="tagline">Apps and libraries written in Fearless</p>
+      <nav aria-label="Site">
+        <a href="#guide">How to use</a>
+        <a href="#ranks">Ranks</a>
+        <a href="#add">Add your demo</a>
+        <a href="https://github.com/FearlessLang">FearlessLang</a>
+        <a href="https://github.com/MarcoServetto/fearless_demos">Repository</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="hero_title">
+      <div class="wrap">
+        <p class="eyebrow">Made with Fearless</p>
+        <h1 id="hero_title">Download, run and learn from programs written in Fearless</h1>
+        <p class="lead">Every demo is one zip. An app opens in the Fearless manager. A library goes into your own Fearless project.</p>
+        <div class="search" role="search">
+          <label class="sr" for="search">Search demos by title, summary, tag or id</label>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="search" type="search" placeholder="Search by title, summary, tag or id" autocomplete="off" spellcheck="false">
+        </div>
+        <p id="stats" class="stats"></p>
+      </div>
+    </section>
+    <div class="wrap layout" id="demos">
+      <aside class="filters" aria-label="Filters">
+        <div class="filters_head">
+          <h2 class="filters_title">Filters</h2>
+          <button type="button" id="filters_toggle" class="filters_toggle" aria-expanded="false" aria-controls="filters_body">
+            <span>Filters</span><span id="filters_badge" class="filters_badge" hidden></span>
+          </button>
+          <button type="button" class="plain clear_button" disabled>Clear filters</button>
+        </div>
+        <div id="filters_body" class="filters_body" hidden>
+          <fieldset>
+            <legend>Rank by name</legend>
+            <div id="rank_names" class="chips"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Exact rank</legend>
+            <form id="rank_form" class="rank_form" novalidate>
+              <label class="sr" for="rank_input">Rank with its number, for example core120</label>
+              <input id="rank_input" list="rank_list" placeholder="core120" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="rank_error">
+              <button type="submit" class="small">Add</button>
+              <datalist id="rank_list"></datalist>
+            </form>
+            <p id="rank_error" class="field_error" role="alert"></p>
+            <div id="exact_ranks" class="chips"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Kind</legend>
+            <div class="segmented">
+              <label><input type="radio" name="kind" value="all" checked><span>All</span></label>
+              <label><input type="radio" name="kind" value="app"><span>Apps</span></label>
+              <label><input type="radio" name="kind" value="library"><span>Libraries</span></label>
+            </div>
+            <label class="check"><input type="checkbox" name="edu"><span>Educational only</span></label>
+          </fieldset>
+          <fieldset>
+            <legend>Tags</legend>
+            <div class="segmented">
+              <label><input type="radio" name="match" value="all" checked><span>Match all</span></label>
+              <label><input type="radio" name="match" value="any"><span>Match any</span></label>
+            </div>
+            <div id="tag_chips" class="chips"></div>
+          </fieldset>
+        </div>
+      </aside>
+      <section class="results" aria-labelledby="results_title">
+        <div class="toolbar">
+          <h2 id="results_title">Demos</h2>
+          <p id="count" class="count" aria-live="polite"></p>
+          <div class="sort">
+            <label for="sort">Sort by</label>
+            <select id="sort" name="sort">
+              <option value="title">Title A-Z</option>
+              <option value="rank">Rank</option>
+              <option value="kind">Kind</option>
+            </select>
+          </div>
+        </div>
+        <div id="loading" role="status">
+          <span class="sr">Loading demos</span>
+          <ul class="grid" aria-hidden="true">
+            <li class="card skeleton"></li><li class="card skeleton"></li><li class="card skeleton"></li>
+            <li class="card skeleton"></li><li class="card skeleton"></li><li class="card skeleton"></li>
+          </ul>
+        </div>
+        <noscript><p class="notice">The list of demos needs JavaScript.</p></noscript>
+        <ul id="grid" class="grid"></ul>
+        <div id="empty" class="notice" hidden>
+          <h3>No demo matches these filters</h3>
+          <p>Remove a filter or search for another word.</p>
+          <button type="button" class="small clear_button">Clear filters</button>
+        </div>
+        <div id="error" class="notice error" role="alert" hidden>
+          <h3>The demos could not be loaded</h3>
+          <p id="error_text"></p>
+          <button type="button" id="retry" class="small">Try again</button>
+        </div>
+      </section>
+    </div>
+    <div class="wrap info">
+      <section id="guide" aria-labelledby="guide_title">
+        <h2 id="guide_title">How to use a demo</h2>
+        <div class="steps">
+          <article>
+            <h3>Run an app</h3>
+            <ol>
+              <li>Download the zip of an app. The name of the zip ends with <code>_app.zip</code> or <code>_edu_app.zip</code>.</li>
+              <li>Create an empty folder and place the zip alone in the folder.</li>
+              <li>Import the folder with the Fearless manager.</li>
+            </ol>
+          </article>
+          <article>
+            <h3>Use a library</h3>
+            <ol>
+              <li>Download the zip of a library. The name of the zip ends with <code>_lib.zip</code> or <code>_edu_lib.zip</code>.</li>
+              <li>Copy the zip, unzipped or not, into a Fearless project.</li>
+              <li>The copy adds the library to the project.</li>
+            </ol>
+          </article>
+        </div>
+        <p class="aside">The part <code>_edu_</code> in the name of a zip marks an educational demo: a demo designed to teach programming in Fearless.</p>
+      </section>
+      <section id="ranks" aria-labelledby="ranks_title">
+        <h2 id="ranks_title">Ranks</h2>
+        <p>Every demo has a rank: one of these eight names followed by three digits, for example <code>core120</code> or <code>app999</code>.</p>
+        <ol class="scale" aria-label="Rank names from lowest to highest">
+          <li><code>base</code></li><li><code>core</code></li><li><code>driver</code></li><li><code>worker</code></li>
+          <li><code>framework</code></li><li><code>accumulator</code></li><li><code>tool</code></li><li><code>app</code></li>
+        </ol>
+        <p>The names are ordered from <code>base</code>, the lowest, to <code>app</code>, the highest.</p>
+        <p>A library is used by code of a higher rank.</p>
+        <p>A demo with rank <code>app</code> and any three digits is a program. Every other rank is a library.</p>
+      </section>
+      <section id="add" aria-labelledby="add_title">
+        <h2 id="add_title">Add your demo</h2>
+        <p>Add one file named <code>demos/&lt;id&gt;.json</code> to the repository with a pull request. The next deployment of the site lists the demo.</p>
+        <pre tabindex="0"><code>{
+  "title": "Lights Out",
+  "summary": "One or two sentences.",
+  "rank": "app999",
+  "tags": ["game", "puzzle", "gui"],
+  "download": "https://example.org/lights_out/lights_out_app.zip",
+  "page": "https://example.org/lights_out/",
+  "image": "https://example.org/lights_out/picture.png"
+}</code></pre>
+        <ul class="rules">
+          <li>The fields <code>title</code>, <code>summary</code>, <code>rank</code>, <code>tags</code> and <code>download</code> are required. The fields <code>page</code> and <code>image</code> are optional.</li>
+          <li>The id is the name of the file without <code>.json</code>: lowercase letters, digits and underscores, starting with a letter.</li>
+          <li>A tag is made of lowercase letters, digits and single spaces.</li>
+          <li>The fields <code>download</code>, <code>page</code> and <code>image</code> are https URLs.</li>
+          <li>The zip named by <code>download</code> ends with <code>_app.zip</code> or <code>_edu_app.zip</code> for the rank <code>app</code>, and with <code>_lib.zip</code> or <code>_edu_lib.zip</code> for any other rank.</li>
+        </ul>
+        <p><a class="button primary" href="https://github.com/MarcoServetto/fearless_demos/tree/main/demos">Open the demos folder</a>
+        <a class="button" href="https://github.com/MarcoServetto/fearless_demos#readme">Read the full format</a></p>
+      </section>
+    </div>
+  </main>
+  <footer class="site_footer">
+    <div class="wrap">
+      <p>Fearless Demos is a static site. The list of demos is built from the files in the <a href="https://github.com/MarcoServetto/fearless_demos/tree/main/demos">demos folder</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
