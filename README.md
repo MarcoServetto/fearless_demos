@@ -11,7 +11,7 @@ The only request to another site is the picture that a demo names in its field `
 ## Layout of the repository
 
 - `demos/<id>.json`: one file per demo.
-- `site/`: `index.html`, `styles.css`, `app.js` and `favicon.svg`.
+- `site/`: `index.html`, `styles.css`, `app.js` and `icon.png`, the Fearless icon.
 - `.github/workflows/pages.yml`: validates the demos, builds the website and deploys the website to GitHub Pages.
 
 Adding a file to `demos/` is the only step that makes the website list a new demo.

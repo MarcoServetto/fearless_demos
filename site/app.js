@@ -121,9 +121,8 @@ function tileFor(demo) {
   let hash = 0;
   for (const character of demo.id) { hash = (hash * 31 + character.charCodeAt(0)) >>> 0; }
   const tile = el("div", { class: "tile", "aria-hidden": "true" }, el("span", { class: "monogram" }, monogram(demo.id)));
-  const hue = seed => (seed % 300 + 80) % 360;
-  tile.style.setProperty("--h1", hue(hash));
-  tile.style.setProperty("--h2", hue(hash + 40 + (hash >>> 9) % 80));
+  tile.style.setProperty("--angle", 70 + hash % 60 + "deg");
+  tile.style.setProperty("--split", 22 + (hash >>> 9) % 30 + "%");
   if (demo.image) {
     const image = el("img", { src: demo.image, alt: "", width: "640", height: "360", loading: "lazy", referrerpolicy: "no-referrer" });
     image.addEventListener("error", () => image.remove());
